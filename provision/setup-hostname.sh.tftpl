@@ -1,0 +1,10 @@
+#!/usr/bin/sh
+
+set -eu
+
+if [ "$(id -u)" -ne "0" ]; then
+  exec sudo "$0" "$@"
+fi
+
+hostnamectl hostname "${hostname}"
+echo "${ipv4} ${hostname}" | tee -a /etc/hosts > /dev/null
