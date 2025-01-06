@@ -34,7 +34,7 @@ jobs:
 
       - name: Permissions workaround
         run: |
-          sudo sed -i -r 's/^#[:space:]*security_driver[:space:]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
+          sudo sed -i -r 's/^#[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
           sudo chgrp libvirt-qemu /var/lib/libvirt/images
           sudo chmod 751 /var/lib/libvirt/images
 
