@@ -40,10 +40,12 @@ jobs:
       - name: Permissions workaround
         run: |
           sudo sed -i -r 's/^#[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
+          sudo sed -i -r 's/^#[[:space:]]*auth_unix_ro[[:space:]]*=[^=]+/auth_unix_ro = "polkit"/' /etc/libvirt/libvirtd.conf
+          sudo sed -i -r 's/^#[[:space:]]*auth_unix_rw[[:space:]]*=[^=]+/auth_unix_rw = "polkit"/' /etc/libvirt/libvirtd.conf
           sudo chmod 755 /var/lib/libvirt/images
-          sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules
+          sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules > /dev/null
+          sudo systemctl restart libvirtd.service
           stat /var/run/libvirt/libvirt-sock
-          cat /etc/polkit-1/rules.d/80-libvirt-manage.rules
 
       - name: Enable KVM group perms
         run: |
