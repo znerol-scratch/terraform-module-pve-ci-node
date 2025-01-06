@@ -46,8 +46,10 @@ jobs:
           sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules > /dev/null
           sudo systemctl daemon-reload
           sudo systemctl stop libvirtd.service
-          sudo systemctl restart libvirtd.socket || sudo journalctl --unit libvirtd.socket
+          sudo systemctl restart libvirtd.sockets
           stat /var/run/libvirt/libvirt-sock
+          sudo virsh -c qemu:///system pool-list --all
+          sudo virsh -c qemu:///system net-list --all
 
       - name: Enable KVM group perms
         run: |
