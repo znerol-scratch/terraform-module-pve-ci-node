@@ -23,6 +23,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Override libvirt socket permissions
+        run: |
+          sudo install -o root -g root -m 0644 -D .github/workflow-templates/socket-perms.conf /etc/systemd/system/libvirtd.socket.d/socket-perms.conf
+
       - name: Install libvirt
         run: >-
           sudo apt-get update &&
@@ -41,12 +45,7 @@ jobs:
       - name: Permissions workaround
         run: |
           sudo sed -i -r 's/^#?[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
-          sudo install -o root -g root -m 0644 -D .github/workflow-templates/socket-perms.conf /etc/systemd/system/libvirtd.socket.d/socket-perms.conf
           sudo chmod 755 /var/lib/libvirt/images
-          sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules > /dev/null
-          sudo systemctl daemon-reload
-          sudo systemctl stop libvirtd.service
-          sudo systemctl restart libvirtd.sockets
           stat /var/run/libvirt/libvirt-sock
           sudo virsh -c qemu:///system pool-list --all
           sudo virsh -c qemu:///system net-list --all
