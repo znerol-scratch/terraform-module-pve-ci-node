@@ -60,4 +60,4 @@ jobs:
       - name: Run tofu
         run: |
           tofu init &&
-          tofu apply -auto-approve
+          tofu apply -auto-approve; ls -lh /var/lib/libvirt/images
