@@ -45,10 +45,10 @@ jobs:
           sudo install -o root -g root -m 0644 -D .github/workflow-templates/socket-perms.conf /etc/systemd/system/libvirtd.socket.d/socket-perms.conf
           sudo chmod 755 /var/lib/libvirt/images
           sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules > /dev/null
-          sudo systemctl daemon-reload || sudo journalctl -xe
-          sudo systemctl restart libvirtd.socket || sudo journalctl -xe
+          sudo systemctl daemon-reload || echo systemctl daemon-reload failed
+          sudo systemctl restart libvirtd.socket || sudo journalctl --unit libvirtd.socket
           stat /var/run/libvirt/libvirt-sock
-          sudo systemctl restart libvirtd.service || sudo journalctl -xe
+          sudo systemctl restart libvirtd.service || sudo journalctl --unit libvirtd.service
 
       - name: Enable KVM group perms
         run: |
