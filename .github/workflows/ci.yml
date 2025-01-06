@@ -46,7 +46,7 @@ jobs:
         run: |
           sudo sed -i -r 's/^#?[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
           stat /var/run/libvirt/libvirt-sock
-          sudo install -o root -g -root -m 755 -d /var/lib/libvirt/images
+          sudo install -o root -g root -m 0755 -d /var/lib/libvirt/images
           virsh -c qemu:///system pool-create-as default dir --target /var/lib/libvirt/images
           virsh -c qemu:///system pool-list --all
           virsh -c qemu:///system net-list --all
