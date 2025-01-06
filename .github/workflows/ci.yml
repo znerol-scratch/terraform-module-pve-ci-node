@@ -40,14 +40,14 @@ jobs:
       - name: Permissions workaround
         run: |
           sudo sed -i -r 's/^#[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
-          sudo chgrp libvirt-qemu /var/lib/libvirt/images
-          sudo chmod 751 /var/lib/libvirt/images
+          sudo chmod 755 /var/lib/libvirt/images
+          sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules > /dev/null
 
       - name: Enable KVM group perms
         run: |
-            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
-            sudo udevadm control --reload-rules
-            sudo udevadm trigger --name-match=kvm
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
 
       - name: Run tofu
         run: |
