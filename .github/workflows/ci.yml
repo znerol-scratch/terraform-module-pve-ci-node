@@ -42,6 +42,7 @@ jobs:
           sudo sed -i -r 's/^#?[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
           sudo sed -i -r 's/^#?[[:space:]]*auth_unix_ro[[:space:]]*=[^=]+/auth_unix_ro = "polkit"/' /etc/libvirt/libvirtd.conf
           sudo sed -i -r 's/^#?[[:space:]]*auth_unix_rw[[:space:]]*=[^=]+/auth_unix_rw = "polkit"/' /etc/libvirt/libvirtd.conf
+          sudo sed -i -r 's/^#?[[:space:]]*unix_sock_rw_perms[[:space:]]*=[^=]+/unix_sock_rw_perms = "0777"/' /etc/libvirt/libvirtd.conf
           sudo grep '^[^#]' /etc/libvirt/qemu.conf /etc/libvirt/libvirtd.conf
           sudo chmod 755 /var/lib/libvirt/images
           sed "s/{{USER}}/${USER}/g" < .github/workflow-templates/80-libvirt-manage.rules.tpl | sudo tee /etc/polkit-1/rules.d/80-libvirt-manage.rules > /dev/null
