@@ -1,0 +1,50 @@
+---
+name: CI
+
+# yamllint disable-line rule:truthy
+on:
+  push:
+    branches:
+      - main
+      - develop
+    tags:
+      - v*
+  pull_request:
+    branches:
+      - main
+      - develop
+
+jobs:
+  integration:
+    name: Integration Test
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install libvirt
+        run: |
+          sudo apt-get update &&
+          sudo DEBIAN_FRONTEND=noninteractive apt-get install --yes --no-install-recommends
+          libvirt-clients
+          libvirt-daemon
+          qemu-kvm
+          xsltproc
+
+      - name: Permissions workaround
+        run: |
+          sudo sed -i -r 's/^#[:space:]*security_driver[:space:]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
+          sudo chgrp libvirt-qemu /var/lib/libvirt/images
+          sudo chmod 751 /var/lib/libvirt/images
+
+      - name: Enable KVM group perms
+        run: |
+            echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+            sudo udevadm control --reload-rules
+            sudo udevadm trigger --name-match=kvm
+
+      - name: Run terraform
+        run: |
+          tf init &&
+          tf apply -auto-approve
