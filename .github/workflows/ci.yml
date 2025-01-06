@@ -46,5 +46,5 @@ jobs:
 
       - name: Run terraform
         run: |
-          tf init &&
-          tf apply -auto-approve
+          terraform init &&
+          terraform apply -auto-approve
