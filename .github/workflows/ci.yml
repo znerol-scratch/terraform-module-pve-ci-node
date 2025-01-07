@@ -71,4 +71,4 @@ jobs:
 
       - name: Dump logs
         run:
-          sudo cat /var/log/libvirt/libvirtd.log
+          sudo cat /var/log/libvirt/libvirtd.log /var/log/kern.log /var/log/apparmor/**/*
