@@ -51,6 +51,12 @@ jobs:
           virsh -c qemu:///system net-list --all
           stat /var/run/libvirt/libvirt-sock /var/lib/libvirt/images
 
+      - name: Verbose logging
+        run: |
+          sudo virt-admin -c virtqemud:///system daemon-log-outputs "3:journald 1:file:/var/log/libvirt/libvirtd.log"
+          sudo virt-admin -c virtqemud:///system daemon-log-filters "3:remote 4:event 3:util.json 3:util.object 3:util.dbus 3:util.netlink 3:node_device 3:rpc 3:access 1:*"
+          sudo virt-admin -c virtqemud:///system daemon-timeout --timeout 0
+
       - name: Enable KVM group perms
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
@@ -58,6 +64,11 @@ jobs:
           sudo udevadm trigger --name-match=kvm
 
       - name: Run tofu
+        continue-on-error: true
         run: |
-          tofu init &&
-          tofu apply -auto-approve; ls -lh /var/lib/libvirt/images
+          tofu init
+          tofu apply -auto-approve
+
+      - name: Dump logs
+        run:
+          cat /var/log/libvirt/libvirtd.log
