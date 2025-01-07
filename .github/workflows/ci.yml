@@ -54,7 +54,7 @@ jobs:
 
       - name: Dump libvirt information
         run: |
-          sudo virt-host-validate
+          sudo virt-host-validate qemu
           virsh -c qemu:///system pool-list --all
           virsh -c qemu:///system net-list --all
           stat /var/run/libvirt/libvirt-sock /var/lib/libvirt/images
