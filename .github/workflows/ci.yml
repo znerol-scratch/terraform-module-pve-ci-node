@@ -42,33 +42,29 @@ jobs:
         with:
           tofu_version: latest
 
-      - name: Permissions workaround
+      - name: Disable libvirtd apparmor
         run: |
           sudo sed -i -r 's/^#?[[:space:]]*security_driver[[:space:]]*=[^=]+/security_driver = "none"/' /etc/libvirt/qemu.conf
+          sudo systemctl stop libvirtd.service
+
+      - name: Setup libvirt storage pool
+        run: |
           sudo install -o root -g libvirt-qemu -m 0755 -d /var/lib/libvirt/images
           virsh -c qemu:///system pool-create-as default dir --target /var/lib/libvirt/images
+
+      - name: Dump libvirt information
+        run: |
           virsh -c qemu:///system pool-list --all
           virsh -c qemu:///system net-list --all
           stat /var/run/libvirt/libvirt-sock /var/lib/libvirt/images
 
-      - name: Verbose logging
-        run: |
-          sudo virt-admin -c libvirtd:///system daemon-log-outputs "3:journald 1:file:/var/log/libvirt/libvirtd.log"
-          sudo virt-admin -c libvirtd:///system daemon-log-filters "2:qemu.qemu_monitor 3:*"
-          sudo virt-admin -c libvirtd:///system daemon-timeout --timeout 0
-
-      - name: Enable KVM group perms
+      - name: Enable KVM group permissions
         run: |
           echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
           sudo udevadm control --reload-rules
           sudo udevadm trigger --name-match=kvm
 
       - name: Run tofu
-        continue-on-error: true
         run: |
           tofu init
           tofu apply -auto-approve
-
-      - name: Dump logs
-        run:
-          sudo cat /var/log/libvirt/libvirtd.log /var/log/kern.log /var/log/apparmor/**/*
