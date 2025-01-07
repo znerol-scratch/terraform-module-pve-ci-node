@@ -82,12 +82,12 @@ resource "libvirt_domain" "node" {
   provisioner "remote-exec" {
     inline = [
       "cloud-init status --wait",
-      templatefile("${path.module}/provision/setup-hostname.sh.tftpl", {
-        hostname = local.nodename
-        ipv4     = self.network_interface[0].addresses[0]
-      }),
-      file("${path.module}/provision/install-pve.sh"),
-      file("${path.module}/provision/setup-interfaces-sdn.sh")
+      # templatefile("${path.module}/provision/setup-hostname.sh.tftpl", {
+      #   hostname = local.nodename
+      #   ipv4     = self.network_interface[0].addresses[0]
+      # }),
+      # file("${path.module}/provision/install-pve.sh"),
+      # file("${path.module}/provision/setup-interfaces-sdn.sh")
     ]
     connection {
       type        = "ssh"
