@@ -27,12 +27,6 @@ jobs:
         run: |
           sudo install -o root -g root -m 0644 -D .github/workflow-templates/socket-perms.conf /etc/systemd/system/libvirtd.socket.d/socket-perms.conf
 
-      - name: Enable KVM nesting
-        run: |
-          echo "options kvm_intel nested=1" | sudo tee /etc/modprobe.d/kvm-nested.conf > /dev/null
-          sudo modprobe -r kvm_intel
-          sudo modprobe kvm_intel
-
       - name: Install libvirt
         run: >-
           sudo apt-get update &&
